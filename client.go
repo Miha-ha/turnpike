@@ -45,6 +45,7 @@ type Client struct {
 	// ReceiveTimeout is the amount of time that the client will block waiting for a response from the router.
 	ReceiveTimeout time.Duration
 	// roles          int
+	topics       map[string]ID
 	listeners    map[ID]chan Message
 	events       map[ID]EventHandler
 	procedures   map[ID]MethodHandler
@@ -328,10 +329,56 @@ func (c *Client) Subscribe(topic string, fn EventHandler) error {
 		return fmt.Errorf(formatUnexpectedMessage(msg, SUBSCRIBED))
 	} else {
 		// register the event handler with this subscription
+		c.topics[topic] = subscribed.Subscription
 		c.events[subscribed.Subscription] = fn
 	}
 	return nil
 }
+
+// Subscribe registers the EventHandler to be called for every message in the provided topic.
+func (c *Client) Unsubscribe(topic string) error {
+	id := c.nextID()
+	c.registerListener(id)
+	subscription := c.topics[topic]
+	unsub := &Unsubscribe{
+		Request:      id,
+		Subscription: subscription,
+	}
+	if err := c.Send(unsub); err != nil {
+		return err
+	}
+	// wait to receive UNSUBSCRIBED message
+	msg, err := c.waitOnListener(id)
+	if err != nil {
+		return err
+	} else if e, ok := msg.(*Error); ok {
+		return fmt.Errorf("error unsubscribing from topic '%v': %v", topic, e.Error)
+	} else if _, ok := msg.(*Unsubscribed); !ok {
+		return fmt.Errorf(formatUnexpectedMessage(msg, UNSUBSCRIBED))
+	} else {
+		// register the event handler with this subscription
+//		c.events[subscribed.Subscription] = fn
+		delete(c.events, subscription)
+		delete(c.topics, topic)
+	}
+	return nil
+}
+
+// Unsubscribe removes a previous subscription with topicURI at the server.
+//
+// Ref: http://wamp.ws/spec#unsubscribe_message
+//func (c *Client) Unsubscribe(topicURI string) error {
+//	if debug {
+//		log.Print("turnpike: sending unsubscribe")
+//	}
+//	msg, err := createUnsubscribe(topicURI)
+//	if err != nil {
+//		return fmt.Errorf("turnpike: %s", err)
+//	}
+//	c.messages <- string(msg)
+//	delete(c.eventHandlers, topicURI)
+//	return nil
+//}
 
 // MethodHandler is an RPC endpoint.
 type MethodHandler func(args []interface{}, kwargs map[string]interface{}) (result *CallResult)
