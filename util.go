@@ -1,6 +1,7 @@
 package turnpike
 
 import (
+	"math"
 	"math/rand"
 	"time"
 )
@@ -63,7 +64,7 @@ const (
 )
 
 const (
-	maxId = 1 << 53
+	maxId = math.MaxInt32
 )
 
 func init() {

@@ -25,3 +25,5 @@ _testmain.go
 
 # Editor cruft
 *.swp
+
+.idea
