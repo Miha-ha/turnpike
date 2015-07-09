@@ -228,6 +228,9 @@ func (c *Client) Receive() {
 		case *Subscribed:
 			c.notifyListener(msg, msg.Request)
 
+		case *Unsubscribed:
+			c.notifyListener(msg, msg.Request)
+
 		case *Result:
 			c.notifyListener(msg, msg.Request)
 
