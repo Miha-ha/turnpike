@@ -4,6 +4,7 @@ import (
 	"math"
 	"math/rand"
 	"time"
+	"fmt"
 )
 
 const (
@@ -73,5 +74,7 @@ func init() {
 
 // NewID generates a random WAMP ID.
 func NewID() ID {
-	return ID(rand.Intn(maxId))
+	id := ID(rand.Intn(maxId))
+	fmt.Println("new id:", id)
+	return id
 }
