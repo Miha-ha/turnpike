@@ -67,7 +67,9 @@ func newWebsocketServer(r Router) *WebsocketServer {
 		Router:    r,
 		protocols: make(map[string]protocol),
 	}
-	s.upgrader = &websocket.Upgrader{}
+	s.upgrader = &websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool { return true },
+	}
 	s.RegisterProtocol(jsonWebsocketProtocol, websocket.TextMessage, new(JSONSerializer))
 	s.RegisterProtocol(msgpackWebsocketProtocol, websocket.BinaryMessage, new(MessagePackSerializer))
 	return s

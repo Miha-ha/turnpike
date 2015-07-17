@@ -67,6 +67,7 @@ func NewClient(p Peer) *Client {
 		Peer:           p,
 		ReceiveTimeout: 5 * time.Second,
 		// roles:          roles,
+		topics:		  make(map[string]ID),
 		listeners:    make(map[ID]chan Message),
 		events:       make(map[ID]EventHandler),
 		procedures:   make(map[ID]MethodHandler),
