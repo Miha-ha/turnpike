@@ -64,7 +64,7 @@ const (
 )
 
 const (
-	maxId = math.MaxInt32
+	maxId int32 = math.MaxInt32
 )
 
 func init() {
