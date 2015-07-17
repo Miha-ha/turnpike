@@ -74,7 +74,7 @@ func init() {
 
 // NewID generates a random WAMP ID.
 func NewID() ID {
-	id := ID(rand.Intn(maxId))
+	id := ID(rand.Int31n(maxId))
 	fmt.Println("new id:", id)
 	return id
 }
